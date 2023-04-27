@@ -125,18 +125,37 @@ class Chatbot:
         print("Attention: Extracted titles:", titles)
 
         if titles != []: titleIdx = self.find_movies_idx_by_title(titles[0])
-        print("Attention: Index of movie with title {}: {}".format(titles[0], titleIdx))
+        print("Attention: Index of movie with title \"{}\": {}".format(titles[0], titleIdx))
 
         if (titles == []):
             response = "Tell me about a movie that you have seen, with the name of the movie in quotation marks."
 
         elif (len(titleIdx) > 1):
-            response = "I found more than one movie with that name, which one did you mean?"
-            print("Attention: Multiple movies found with title", titles[0],"\n")
+            clarification = line
+
+            print("Attention: Multiple movies found with title \"{}\"".format(titles[0]), '\n')     
+
+            movie_list = ', '.join(['ID:{} Title: "{}"'.format(idx, self.titles[idx][0]) for idx in titleIdx])
+            for idx in titleIdx:
+                print("Attention: Adding index", idx, "to the movie list:", self.titles[idx][0], "\n")
+            print("Attention: The list of movie titles is:", movie_list, '\n')
+
+            #response = "I found more than one movie with that name, which one did you mean? \n\n\t{}".format(movie_list)
+            
+            clarification = input("Which one did you mean? \nPlease enter the ID of the movie: ")
+
+            if clarification.isdigit() and int(clarification) in titleIdx:
+                titleIdx = [int(clarification)]
+
+                response = "Got it, you meant '{}'\n".format(self.titles[titleIdx[0]][0])
+                
+            else:
+                response = "Sorry, I didn't understand that. Please enter the ID of the movie you meant."
 
         elif (len(titleIdx) == 1):
-            response = "Got it, you meant '{}'\n".format(self.titles[titleIdx[0]][0])
+            response = "\nGot it, you meant '{}'\n".format(self.titles[titleIdx[0]][0])
             print("Attention: Unique movie found with title", titles[0],"\n")
+
         else:
             response = "Sorry, I couldn't find any movie with that title!"
             print("Attention: No movies found with title", titles[0],"\n")
@@ -305,6 +324,7 @@ class Chatbot:
         #                          START OF YOUR CODE                          #
         ########################################################################                                                 
         matches = [t for t in candidates if re.search(clarification, self.titles[t][0], re.IGNORECASE) is not None]
+        print("Attention: The candidates that matched the input 'clarification' '{}' are at indices:".format(clarification), matches)
 
         return matches # TODO: delete and replace this line
         ########################################################################
