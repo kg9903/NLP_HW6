@@ -25,7 +25,8 @@ class Chatbot:
         
         # Load sentiment words 
         self.sentiment = util.load_sentiment_dictionary('data/sentiment.txt')
-
+        #print("Attention:", self.sentiment)
+        
         # Train the classifier
         self.train_logreg_sentiment_classifier()
 
@@ -131,7 +132,6 @@ class Chatbot:
             response = "Tell me about a movie that you have seen, with the name of the movie in quotation marks."
 
         elif (len(titleIdx) > 1):
-            clarification = line
 
             print("Attention: Multiple movies found with title \"{}\"".format(titles[0]), '\n')     
 
@@ -141,6 +141,8 @@ class Chatbot:
             print("Attention: The list of movie titles is:", movie_list, '\n')
 
             response = "I found more than one movie with that name, which one did you mean? \n\n\t{}".format(movie_list)
+            
+
             
 
 
@@ -358,9 +360,32 @@ class Chatbot:
         ########################################################################
         #                          START OF YOUR CODE                          #
         ########################################################################                                                  
-        return 0 # TODO: delete and replace this line
+        #return 0 # TODO: delete and replace this line
 
+        words = user_input.lower().split()
 
+        print(f'Attention: User input: {user_input}')
+        print(f'Attention: Lowercase words: {words}')
+
+        pos_tokcount = 0
+
+        neg_tokcount = 0
+
+        for word in words:
+            if word in self.sentiment:
+
+                if self.sentiment[word] == 'positive':
+                    pos_tokcount += 1
+
+                elif self.sentiment[word] == 'negative':
+                    neg_tokcount += 1
+
+        print(f'Attention: Positive token count: {pos_tokcount}')
+
+        print(f'Attention: Negative token count: {neg_tokcount}')
+
+        if pos_tokcount == 0 and neg_tokcount == 0:
+            return 0
 
         ########################################################################
         #                          END OF YOUR CODE                            #
