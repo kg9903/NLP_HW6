@@ -140,17 +140,9 @@ class Chatbot:
                 print("Attention: Adding index", idx, "to the movie list:", self.titles[idx][0], "\n")
             print("Attention: The list of movie titles is:", movie_list, '\n')
 
-            #response = "I found more than one movie with that name, which one did you mean? \n\n\t{}".format(movie_list)
+            response = "I found more than one movie with that name, which one did you mean? \n\n\t{}".format(movie_list)
             
-            clarification = input("Which one did you mean? \nPlease enter the ID of the movie: ")
 
-            if clarification.isdigit() and int(clarification) in titleIdx:
-                titleIdx = [int(clarification)]
-
-                response = "Got it, you meant '{}'\n".format(self.titles[titleIdx[0]][0])
-                
-            else:
-                response = "Sorry, I didn't understand that. Please enter the ID of the movie you meant."
 
         elif (len(titleIdx) == 1):
             response = "\nGot it, you meant '{}'\n".format(self.titles[titleIdx[0]][0])
@@ -367,6 +359,9 @@ class Chatbot:
         #                          START OF YOUR CODE                          #
         ########################################################################                                                  
         return 0 # TODO: delete and replace this line
+
+
+
         ########################################################################
         #                          END OF YOUR CODE                            #
         ########################################################################
