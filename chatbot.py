@@ -41,7 +41,7 @@ class Chatbot:
         Consider adding to this description any information about what your
         chatbot can do and how the user can interact with it.
         """
-        intro_message = "Hi! I'm IMDBot! I can recommend a movie to you. Tell me about a movie that you have seen, and please put the name of the movie in quotation marks."
+        intro_message = "Hi, I'm IMDBot!\n\nI can recommend you a movie. 😊 \n\nTell me about a movie that you have seen, and please put the name of the movie in quotation marks.\n"
         return intro_message
         """
         Your task is to implement the chatbot as detailed in the HW6
@@ -57,8 +57,8 @@ class Chatbot:
         ########################################################################
         # TODO: Write a short greeting message                                 #
         ########################################################################
-
-        greeting_message = "How can I help you?"
+        #greeting_message = "How can I help you?"
+        greeting_message = "Example: I _____'Movie Title'"
 
         ########################################################################
         #                             END OF YOUR CODE                         #
@@ -121,20 +121,30 @@ class Chatbot:
         # code in a modular fashion to make it easier to improve and debug.    #
         ########################################################################
         titles = self.extract_titles(line)
+
+        titleIdx = []
+
         if titles != []: titleIdx = self.find_movies_idx_by_title(titles[0])
+
         if (titles == []):
             response = "Tell me about a movie that you have seen, with the name of the movie in quotation marks."
+
         elif (len(titleIdx) > 1):
             response = "I found more than one movie with that name, which one did you mean?"
-        else: 
+
+        elif (len(titleIdx) == 1):
             response = "Got it, you meant '{}'".format(self.titles[titleIdx[0]][0])
+        
+        else:
+            response = "Sorry, I couldn't find any movie with that title."
 
         #response = "I (the chatbot) processed '{}'".format(line)
+
+        return response
 
         ########################################################################
         #                          END OF YOUR CODE                            #
         ########################################################################
-        return response
 
     def extract_titles(self, user_input: str) -> list:
         """Extract potential movie titles from the user input.
