@@ -122,24 +122,24 @@ class Chatbot:
         ########################################################################
         
         titles = self.extract_titles(line)
-        print("Debug: Extracted titles:", titles)
+        print("Attention: Extracted titles:", titles)
 
         if titles != []: titleIdx = self.find_movies_idx_by_title(titles[0])
-        print("Debug: Index of movie with title {}: {}".format(titles[0], titleIdx))
+        print("Attention: Index of movie with title {}: {}".format(titles[0], titleIdx))
 
         if (titles == []):
             response = "Tell me about a movie that you have seen, with the name of the movie in quotation marks."
 
         elif (len(titleIdx) > 1):
             response = "I found more than one movie with that name, which one did you mean?"
-            print("Debug: Multiple movies found with title", titles[0],"\n")
+            print("Attention: Multiple movies found with title", titles[0],"\n")
 
         elif (len(titleIdx) == 1):
             response = "Got it, you meant '{}'\n".format(self.titles[titleIdx[0]][0])
-            print("Debug: Unique movie found with title", titles[0],"\n")
+            print("Attention: Unique movie found with title", titles[0],"\n")
         else:
             response = "Sorry, I couldn't find any movie with that title!"
-            print("Debug: No movies found with title", titles[0],"\n")
+            print("Attention: No movies found with title", titles[0],"\n")
 
         #response = "I (the chatbot) processed '{}'".format(line)
 
@@ -189,7 +189,7 @@ class Chatbot:
 
         x = re.findall(pattern, user_input)   
 
-        print("\nDebug: Extract_Titles: ",x, "\n")                                            
+        print("\nAttention: Extract_Titles: ",x, "\n")                                            
         
         return x
 
@@ -235,10 +235,10 @@ class Chatbot:
         ########################################################################                                                 
         
         cleanTitles = [re.match(r"(.*)\(", t[0]) if re.match(r"(.*)\(", t[0]) is not None else re.match(r"(.*)", t[0]) for t in self.titles ]
-        #print("Debug: Cleaned titles after applying regex pattern are:", cleanTitles)
+        #print("Attention: Cleaned titles after applying regex pattern are:", cleanTitles)
 
         matches = [cleanTitles.index(t) for t in cleanTitles if re.search(title, t[0]) is not None]
-        #print("Debug: Titles that matched the input 'title' are at indices:", matches)
+        #print("Attention: Titles that matched the input 'title' are at indices:", matches)
         
         # print("Individual matches found by the regular expression are:")
         # for m in cleanTitles:
