@@ -58,7 +58,7 @@ class Chatbot:
         # TODO: Write a short greeting message                                 #
         ########################################################################
         #greeting_message = "How can I help you?"
-        greeting_message = "Example: I _____'Movie Title'"
+        greeting_message = "Example: I _____'Movie Title'\n"
 
         ########################################################################
         #                             END OF YOUR CODE                         #
@@ -120,23 +120,26 @@ class Chatbot:
         # directly based on how modular it is, we highly recommended writing   #
         # code in a modular fashion to make it easier to improve and debug.    #
         ########################################################################
+        
         titles = self.extract_titles(line)
-
-        titleIdx = []
+        print("Debug: Extracted titles:", titles)
 
         if titles != []: titleIdx = self.find_movies_idx_by_title(titles[0])
+        print("Debug: Index of movie with title {}: {}".format(titles[0], titleIdx))
 
         if (titles == []):
             response = "Tell me about a movie that you have seen, with the name of the movie in quotation marks."
 
         elif (len(titleIdx) > 1):
             response = "I found more than one movie with that name, which one did you mean?"
+            print("Debug: Multiple movies found with title", titles[0],"\n")
 
         elif (len(titleIdx) == 1):
-            response = "Got it, you meant '{}'".format(self.titles[titleIdx[0]][0])
-        
+            response = "Got it, you meant '{}'\n".format(self.titles[titleIdx[0]][0])
+            print("Debug: Unique movie found with title", titles[0],"\n")
         else:
-            response = "Sorry, I couldn't find any movie with that title."
+            response = "Sorry, I couldn't find any movie with that title!"
+            print("Debug: No movies found with title", titles[0],"\n")
 
         #response = "I (the chatbot) processed '{}'".format(line)
 
@@ -183,8 +186,13 @@ class Chatbot:
         #                          START OF YOUR CODE                          #
         ########################################################################   
         pattern = r"[\"]([^\"]*)[\"]"
-        x = re.findall(pattern, user_input)                                       
+
+        x = re.findall(pattern, user_input)   
+
+        print("\nDebug: Extract_Titles: ",x, "\n")                                            
+        
         return x
+
         ########################################################################
         #                          END OF YOUR CODE                            #
         ########################################################################
@@ -225,10 +233,18 @@ class Chatbot:
         ########################################################################
         #                          START OF YOUR CODE                          #
         ########################################################################                                                 
+        
         cleanTitles = [re.match(r"(.*)\(", t[0]) if re.match(r"(.*)\(", t[0]) is not None else re.match(r"(.*)", t[0]) for t in self.titles ]
-        matches = [cleanTitles.index(t) for t in cleanTitles if re.search(title, t[0]) is not None]
+        #print("Debug: Cleaned titles after applying regex pattern are:", cleanTitles)
 
-        return matches
+        matches = [cleanTitles.index(t) for t in cleanTitles if re.search(title, t[0]) is not None]
+        #print("Debug: Titles that matched the input 'title' are at indices:", matches)
+        
+        # print("Individual matches found by the regular expression are:")
+        # for m in cleanTitles:
+        #     print(m.group(0))
+
+        return matches  
         ########################################################################
         #                          END OF YOUR CODE                            #
         ########################################################################
