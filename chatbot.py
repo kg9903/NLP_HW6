@@ -57,7 +57,7 @@ class Chatbot:
         self.asked_to_recommend = True
 
         self.emotions = {
-            'angry': ['mad', 'furious', 'irritated', 'annoyed', 'enraged'],
+            'angry': ['mad', 'furious', 'irritated', 'annoyed', 'enraged', 'angry'],
             'happy': ['happy', 'joyful', 'glad', 'delighted', 'cheerful', 'content'],
             'sad': ['sad', 'depressed', 'down', 'unhappy', 'gloomy', 'melancholic'],
             'confused': ['confused', 'puzzled', 'baffled', 'uncertain', 'disoriented', 'perplexed'],
@@ -673,28 +673,33 @@ Example: I _____(liked/disliked/...) "Movie Title"
         pass
 
     # def function2():
-    #     """
-    #     TODO: delete and replace with your function.
-    #     Be sure to put an adequate description in this docstring.
-    #     """
-    #     pass
-
+    # 2. Identify and respond to emotions
     def user_emotion(self, user_input: str) -> Tuple[str, str]:
-        
-        words = re.findall(r'\b\w+\b', user_input.lower())
-        
-        identified_emotions = defaultdict(int)
+        """
+        Identify and respond to emotions with a simple rule-based keyword search approach.
+        The keywords are defined in self.emotions.
 
+        Arguments:
+            - user_input (str): user input line
+
+        Returns: Tuple[str, str]
+            - identified emotion (str): "angry", "happy", "sad", "confused", or "neutral"
+            - response (str): a response for the emotion
+        """
+
+        words = re.sub(r'".*?"', '', user_input.lower())
+        words = re.findall(r'\b\w+\b', words)
+
+        # emotion -> count, where emotion is "angry", "happy", "sad", "confused"
         identified_emotions = {
-            emotion: sum(1 for word in words if word in keywords)
-            for emotion, keywords in self.emotions.items()
+            emotion: sum(1 for word in words if word in keywords) for emotion, keywords in self.emotions.items()
         }
 
-        if not identified_emotions:
+        if sum(identified_emotions.values()) == 0:
             return 'neutral', "I'm here to help you. I can recommend you a movie to make your day better! 🤗"
 
         max_val_emotion = max(identified_emotions, key = identified_emotions.get)
-        
+
         emoji = self.emotion_emojis.get(max_val_emotion, '')
 
         response = f"I see that you're feeling {max_val_emotion}. {emoji} I'm here to help you! I can recommend you a movie to make your day better! 🤗"
