@@ -185,12 +185,12 @@ Example: I _____(liked/disliked/...) "Movie Title"
         # if the user is not neutral, return the emotion response
         if detected_emotion != 'neutral':
             return emotion_response
-        
+
         if len(self.sentiments) < 5:
 
             # gather sentiment data
             titles = self.extract_titles(line)
-            
+
             if (len(titles) == 0):
                 response = "Tell me about a movie that you have seen, with the name of the movie **in quotation marks**."
                 return response
@@ -665,14 +665,16 @@ Example: I _____(liked/disliked/...) "Movie Title"
     # 5. Open-ended                                                            #
     ############################################################################
 
-    def function1():
+    def function1(self, input: str):
         """
         TODO: delete and replace with your function.
         Be sure to put an adequate description in this docstring.
         """
-        pass
+        titles = self.extract_titles(input)
+        dearticled = [re.match(r"(?:(The |An ))*(.*)", t)[2] for t in titles]
+        return self.find_movies_idx_by_title(dearticled[0])
 
-    # def function2():
+    # def function2(self, input: str):
     # 2. Identify and respond to emotions
     def user_emotion(self, user_input: str) -> Tuple[str, str]:
         """
