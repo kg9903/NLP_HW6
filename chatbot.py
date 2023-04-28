@@ -359,33 +359,43 @@ class Chatbot:
         """
         ########################################################################
         #                          START OF YOUR CODE                          #
-        ########################################################################                                                  
-        #return 0 # TODO: delete and replace this line
+        ########################################################################        
+    
 
-        words = user_input.lower().split()
+        words = re.sub(r'".*?"', '', user_input.lower())
+        print("Attention: After removing movie title:", words)
 
-        print(f'Attention: User input: {user_input}')
-        print(f'Attention: Lowercase words: {words}')
-
-        pos_tokcount = 0
-
-        neg_tokcount = 0
+        words = re.findall(r'\b\w+\b', words)
+        print("Attention: After split:", words)
+        
+        p_tkcount = 0
+        
+        n_tkcount = 0
 
         for word in words:
+            print("Attention: The word '{}' is in the sentiment dictionary: {}".format(word, word in self.sentiment))
+
             if word in self.sentiment:
+                print("Attention: The word '{}' is in the sentiment dictionary".format(word))
 
-                if self.sentiment[word] == 'positive':
-                    pos_tokcount += 1
+                if self.sentiment[word] == 'pos':
+                    print("Attention: The word '{}' is positive".format(word))
+                    p_tkcount += 1
+                    print("Attention: The current pos_tokcount is:", p_tkcount)
 
-                elif self.sentiment[word] == 'negative':
-                    neg_tokcount += 1
+                elif self.sentiment[word] == 'neg':
+                    print("Attention: The word '{}' is negative".format(word))  
+                    n_tkcount += 1
+                    print("Attention: The current neg_tokcount is:", n_tkcount)
 
-        print(f'Attention: Positive token count: {pos_tokcount}')
 
-        print(f'Attention: Negative token count: {neg_tokcount}')
-
-        if pos_tokcount == 0 and neg_tokcount == 0:
+        if p_tkcount == 0 and n_tkcount == 0:
             return 0
+        
+        else:
+            return (p_tkcount - n_tkcount) / (p_tkcount + n_tkcount)
+                                          
+        #return 0 # TODO: delete and replace this line
 
         ########################################################################
         #                          END OF YOUR CODE                            #
