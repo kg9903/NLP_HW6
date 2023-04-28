@@ -667,12 +667,23 @@ Example: I _____(liked/disliked/...) "Movie Title"
 
     def function1(self, input: str):
         """
-        TODO: delete and replace with your function.
-        Be sure to put an adequate description in this docstring.
+        This function takes user input and removes the articles in movie titles, 
+        if any. This allows us to match user input with movie titles that start 
+        with articles in the database.
+
+        Arguments:
+            - input (str): user input from the REPL
+
+        Returns:
+            - list of indices of potential movie titles
+
         """
         titles = self.extract_titles(input)
         dearticled = [re.match(r"(?:(The |An ))*(.*)", t)[2] for t in titles]
-        return self.find_movies_idx_by_title(dearticled[0])
+        idx = []
+        for t in dearticled:
+            idx.extend(self.find_movies_idx_by_title(t))
+        return idx
 
     # def function2(self, input: str):
     # 2. Identify and respond to emotions
