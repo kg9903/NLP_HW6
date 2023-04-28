@@ -143,7 +143,6 @@ class Chatbot:
             response = "I found more than one movie with that name, which one did you mean? \n\n\t{}".format(movie_list)
             
 
-            
 
 
         elif (len(titleIdx) == 1):
@@ -248,14 +247,8 @@ class Chatbot:
         ########################################################################                                                 
         
         cleanTitles = [re.match(r"(.*)\(", t[0]) if re.match(r"(.*)\(", t[0]) is not None else re.match(r"(.*)", t[0]) for t in self.titles ]
-        #print("Attention: Cleaned titles after applying regex pattern are:", cleanTitles)
 
-        matches = [cleanTitles.index(t) for t in cleanTitles if re.search(title, t[0]) is not None]
-        #print("Attention: Titles that matched the input 'title' are at indices:", matches)
-        
-        # print("Individual matches found by the regular expression are:")
-        # for m in cleanTitles:
-        #     print(m.group(0))
+        matches = [cleanTitles.index(t) for t in cleanTitles if re.search(title, t[0]) is not None]       
 
         return matches  
         ########################################################################
@@ -390,10 +383,23 @@ class Chatbot:
 
 
         if p_tkcount == 0 and n_tkcount == 0:
+            print("Attention: The sentiment of the input '{}' is neutral".format(user_input))
             return 0
         
         else:
-            return (p_tkcount - n_tkcount) / (p_tkcount + n_tkcount)
+            sentiment_score = (p_tkcount - n_tkcount) / (p_tkcount + n_tkcount)
+            
+            if sentiment_score == 0:
+                print("Attention: The sentiment of the input '{}' is neutral".format(user_input))
+                return sentiment_score
+            
+            elif sentiment_score > 0:
+                print("Attention: The sentiment of the input '{}' is positive".format(user_input))
+                return sentiment_score
+            
+            else:
+                print("Attention: The sentiment of the input '{}' is negative".format(user_input))
+                return sentiment_score
                                           
         #return 0 # TODO: delete and replace this line
 
