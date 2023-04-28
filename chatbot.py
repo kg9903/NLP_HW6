@@ -9,9 +9,9 @@ from sklearn import linear_model
 import nltk
 from collections import defaultdict, Counter
 from typing import List, Dict, Union, Tuple
-
 # for time-based greetings
 import datetime
+
 
 
 import util
@@ -51,9 +51,24 @@ class Chatbot:
         }
 
         self.recommended_movies = []
+
         self.recommended_movies_index = 0
 
         self.asked_to_recommend = True
+
+        self.emotions = {
+            'angry': ['mad', 'furious', 'irritated', 'annoyed', 'enraged'],
+            'happy': ['happy', 'joyful', 'glad', 'delighted', 'cheerful', 'content'],
+            'sad': ['sad', 'depressed', 'down', 'unhappy', 'gloomy', 'melancholic'],
+            'confused': ['confused', 'puzzled', 'baffled', 'uncertain', 'disoriented', 'perplexed'],
+        }
+
+        self.emotion_emojis = {
+            'angry': '😞',
+            'happy': '🙂',
+            'sad': '😢',
+            'confused': '😕',
+        }
 
     ############################################################################
     # 1. WARM UP REPL                                                          #
@@ -164,9 +179,18 @@ Example: I _____(liked/disliked/...) "Movie Title"
         # directly based on how modular it is, we highly recommended writing   #
         # code in a modular fashion to make it easier to improve and debug.    #
         ########################################################################
+
+        # gather emotion data
+        detected_emotion, emotion_response = self.user_emotion(line)
+        # if the user is not neutral, return the emotion response
+        if detected_emotion != 'neutral':
+            return emotion_response
+        
         if len(self.sentiments) < 5:
+
             # gather sentiment data
             titles = self.extract_titles(line)
+            
             if (len(titles) == 0):
                 response = "Tell me about a movie that you have seen, with the name of the movie **in quotation marks**."
                 return response
@@ -532,7 +556,7 @@ Example: I _____(liked/disliked/...) "Movie Title"
         # Train a logistic regression classifier
         self.model.fit(X_train, y_train)
 
-        print("[DEBUG] The accuracy of log reg sentiment classifier is:", self.model.score(X_train, y_train))
+        # print("[DEBUG] The accuracy of log reg sentiment classifier is:", self.model.score(X_train, y_train))
 
 
 
@@ -648,12 +672,34 @@ Example: I _____(liked/disliked/...) "Movie Title"
         """
         pass
 
-    def function2():
-        """
-        TODO: delete and replace with your function.
-        Be sure to put an adequate description in this docstring.
-        """
-        pass
+    # def function2():
+    #     """
+    #     TODO: delete and replace with your function.
+    #     Be sure to put an adequate description in this docstring.
+    #     """
+    #     pass
+
+    def user_emotion(self, user_input: str) -> Tuple[str, str]:
+        
+        words = re.findall(r'\b\w+\b', user_input.lower())
+        
+        identified_emotions = defaultdict(int)
+
+        identified_emotions = {
+            emotion: sum(1 for word in words if word in keywords)
+            for emotion, keywords in self.emotions.items()
+        }
+
+        if not identified_emotions:
+            return 'neutral', "I'm here to help you. I can recommend you a movie to make your day better! 🤗"
+
+        max_val_emotion = max(identified_emotions, key = identified_emotions.get)
+        
+        emoji = self.emotion_emojis.get(max_val_emotion, '')
+
+        response = f"I see that you're feeling {max_val_emotion}. {emoji} I'm here to help you! I can recommend you a movie to make your day better! 🤗"
+
+        return max_val_emotion, response
 
     def function3():
         """
