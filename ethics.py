@@ -19,7 +19,7 @@ distinguish the chatbot responses from those of a human?
 
 Q1_your_answer = """
 
-Delete and put your answer here
+Definitely! We think that users' attribution of human-like traits to chatbots designed to simulate human conversation can lead sometimes to unrealistic expectations, as one may expect the chatbot to possess a level of understanding and a set of feelings that it does not have. Users may become frustrated or believe everything chatbots tell them, which can be potentially dangerous if they cannot understand chatbot’s bias and limitations.
 
 """
 
@@ -35,7 +35,7 @@ Can you think of ways that designers of the chatbot can help to mitigate this ri
 
 Q2_your_answer = """
 
-Delete and put your answer here
+To mitigate the problem of privacy leaks, it is important to have the privacy of user’s data in mind from the very beginning of the development of a chatbot. Designers should provide clear information regarding how data is being used and take actions to increase privacy when inputted data by the user is being accessed at the different steps when computing them.
 
 """
 
@@ -53,7 +53,7 @@ citizens -- should do in anticipation of these risks and/or in response to these
 
 Q3_your_answer = """
 
-Delete and put your answer here
+In anticipation of the potential negative impacts of automation on labor, different stakeholders including government officials, employees at technology companies, and citizens, should work together to mitigate these risks. The government can enact policies to support workers through industry transformation, companies should prioritize developing technologies that complement human labor, and citizens can advocate for policies that protect workers. The past Industrial Revolutions serves as an example of a past technological transformation that ultimately led to overall economic growth, but efforts were needed to protect workers and ensure equitable distribution of benefits and opportunities.
 
 """
 
