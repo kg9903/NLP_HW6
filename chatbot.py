@@ -171,17 +171,19 @@ Example: I _____(liked/disliked/...) "Movie Title"
                 response = "Tell me about a movie that you have seen, with the name of the movie **in quotation marks**."
                 return response
 
-            if (len(self.candidates) == 0):
-                # new conversation, treat titles as new movie titles
-                self.original_input = line
-
-                # using list comprehension (python doesn't have a flatMap!!) for all indices of all mentioned movies
-                self.candidates = [idx for title in titles for idx in self.find_movies_idx_by_title(title)]
-            else:
+            if (len(self.candidates) != 0):
                 # this is a continuation of a previous conversation, using titles to disambiguate
                 # note that we make the assumption that only one movie should be processed at a time
                 # TODO: check if this fits with the sample input
                 self.candidates = self.disambiguate_candidates(" ".join(titles), self.candidates)
+
+            if (len(self.candidates) == 0):
+                # either this is a new conversation, or the user didn't choose from any candidates
+                # treat titles as new movie titles
+                self.original_input = line
+
+                # using list comprehension (python doesn't have a flatMap!!) for all indices of all mentioned movies
+                self.candidates = [idx for title in titles for idx in self.find_movies_idx_by_title(title)]
 
             # handling the candidate indices
             if (len(self.candidates) > 1):
