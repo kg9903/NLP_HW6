@@ -641,14 +641,16 @@ Example: I _____(liked/disliked/...) "Movie Title"
     # 5. Open-ended                                                            #
     ############################################################################
 
-    def function1():
+    def function1(self, input: str):
         """
         TODO: delete and replace with your function.
         Be sure to put an adequate description in this docstring.
         """
-        pass
+        titles = self.extract_titles(input)
+        dearticled = [re.match(r"(?:(The |An ))*(.*)", t)[2] for t in titles]
+        return self.find_movies_idx_by_title(dearticled[0])
 
-    def function2():
+    def function2(self, input: str):
         """
         TODO: delete and replace with your function.
         Be sure to put an adequate description in this docstring.
