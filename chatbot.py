@@ -418,8 +418,8 @@ Example: I _____(liked/disliked/...) "Movie Title"
                     # print("Attention: The current pos_tokcount is:", p_tkcount)
 
                 elif self.sentiment[word] == 'neg':
-                    print("Attention: The word '{}' is negative".format(word))
-                    # n_tkcount += 1
+                    # print("Attention: The word '{}' is negative".format(word))
+                    n_tkcount += 1
                     # print("Attention: The current neg_tokcount is:", n_tkcount)
 
 
