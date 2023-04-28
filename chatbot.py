@@ -196,7 +196,7 @@ Example: I _____(liked/disliked/...) "Movie Title"
                 # we have exactly one candidate, clear the candidates list
                 idx = self.candidates[0]
                 self.candidates = []
-                sentiment = self.predict_sentiment_rule_based(self.original_input)
+                sentiment = self.predict_sentiment_statistical(self.original_input)
 
                 # store the sentiment
                 self.sentiments[idx] = sentiment
@@ -520,7 +520,19 @@ Example: I _____(liked/disliked/...) "Movie Title"
         #                          START OF YOUR CODE                          #
         ########################################################################
 
-        pass # TODO: delete and replace this line
+
+        self.model = linear_model.LogisticRegression()
+        self.count_vectorizer = CountVectorizer(lowercase=True, min_df=20, stop_words='english', max_features=1000)
+
+        X_train = self.count_vectorizer.fit_transform(texts)
+        y_train = np.where(y == 'Fresh', 1, -1)
+
+        # Train a logistic regression classifier
+        self.model.fit(X_train, y_train)
+
+        print("[DEBUG] The accuracy of log reg sentiment classifier is:", self.model.score(X_train, y_train))
+
+
 
         ########################################################################
         #                          END OF YOUR CODE                            #
@@ -559,7 +571,14 @@ Example: I _____(liked/disliked/...) "Movie Title"
         ########################################################################
         #                          START OF YOUR CODE                          #
         ########################################################################
-        return 0 # TODO: delete and replace this line
+        X_in = self.count_vectorizer.transform([user_input.lower()])
+
+        if X_in.sum() == 0:
+            # if input has no words, neutral
+            return 0
+
+        y_pred = self.model.predict(X_in)[0]
+        return y_pred
         ########################################################################
         #                          END OF YOUR CODE                            #
         ########################################################################
