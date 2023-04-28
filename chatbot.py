@@ -321,9 +321,12 @@ Example: I _____(liked/disliked/...) "Movie Title"
         #                          START OF YOUR CODE                          #
         ########################################################################
 
-        cleanTitles = [re.match(r"(.*)\(", t[0]) if re.match(r"(.*)\(", t[0]) is not None else re.match(r"(.*)", t[0]) for t in self.titles ]
+        # cleanTitles = [re.match(r"(.*)\(", t[0]) if re.match(r"(.*)\(", t[0]) is not None else re.match(r"(.*)", t[0]) for t in self.titles ]
 
-        matches = [cleanTitles.index(t) for t in cleanTitles if re.search(title, t[0]) is not None]
+        # matches = [cleanTitles.index(t) for t in cleanTitles if re.search(title, t[0]) is not None]
+
+        # we want to allow for searching over years
+        matches = [i for i, t in enumerate(self.titles) if re.search(re.escape(title), t[0], re.IGNORECASE) is not None]
 
         return matches
         ########################################################################
