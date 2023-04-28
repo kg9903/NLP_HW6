@@ -458,25 +458,32 @@ Example: I _____(liked/disliked/...) "Movie Title"
                     n_tkcount += 1
                     # print("Attention: The current neg_tokcount is:", n_tkcount)
 
-
-        if p_tkcount == 0 and n_tkcount == 0:
-            # print("Attention: The sentiment of the input '{}' is neutral".format(user_input))
+        if p_tkcount > n_tkcount:
+            return 1
+        elif p_tkcount == n_tkcount:
             return 0
-
         else:
-            sentiment_score = (p_tkcount - n_tkcount) / (p_tkcount + n_tkcount)
+            return -1
 
-            if sentiment_score == 0:
-                # print("Attention: The sentiment of the input '{}' is neutral".format(user_input))
-                return sentiment_score
 
-            elif sentiment_score > 0:
-                # print("Attention: The sentiment of the input '{}' is positive".format(user_input))
-                return sentiment_score
+        # if p_tkcount == 0 and n_tkcount == 0:
+        #     # print("Attention: The sentiment of the input '{}' is neutral".format(user_input))
+        #     return 0
 
-            else:
-                # print("Attention: The sentiment of the input '{}' is negative".format(user_input))
-                return sentiment_score
+        # else:
+        #     sentiment_score = (p_tkcount - n_tkcount) / (p_tkcount + n_tkcount)
+
+        #     if sentiment_score == 0:
+        #         # print("Attention: The sentiment of the input '{}' is neutral".format(user_input))
+        #         return sentiment_score
+
+        #     elif sentiment_score > 0:
+        #         # print("Attention: The sentiment of the input '{}' is positive".format(user_input))
+        #         return sentiment_score
+
+        #     else:
+        #         # print("Attention: The sentiment of the input '{}' is negative".format(user_input))
+        #         return sentiment_score
 
         #return 0 # TODO: delete and replace this line
 
