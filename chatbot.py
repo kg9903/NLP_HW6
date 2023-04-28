@@ -50,6 +50,11 @@ class Chatbot:
             -1: ['did not like', 'did not enjoy', 'did not appreciate', 'did not fancy'],
         }
 
+        self.recommended_movies = []
+        self.recommended_movies_index = 0
+
+        self.asked_to_recommend = True
+
     ############################################################################
     # 1. WARM UP REPL                                                          #
     ############################################################################
@@ -159,45 +164,73 @@ Example: I _____(liked/disliked/...) "Movie Title"
         # directly based on how modular it is, we highly recommended writing   #
         # code in a modular fashion to make it easier to improve and debug.    #
         ########################################################################
+        if len(self.sentiments) < 5:
+            # gather sentiment data
+            titles = self.extract_titles(line)
+            if (len(titles) == 0):
+                response = "Tell me about a movie that you have seen, with the name of the movie **in quotation marks**."
+                return response
 
-        titles = self.extract_titles(line)
-        if (len(titles) == 0):
-            response = "Tell me about a movie that you have seen, with the name of the movie **in quotation marks**."
-            return response
+            if (len(self.candidates) == 0):
+                # new conversation, treat titles as new movie titles
+                self.original_input = line
 
-        if (len(self.candidates) == 0):
-            # new conversation, treat titles as new movie titles
-            self.original_input = line
+                # using list comprehension (python doesn't have a flatMap!!) for all indices of all mentioned movies
+                self.candidates = [idx for title in titles for idx in self.find_movies_idx_by_title(title)]
+            else:
+                # this is a continuation of a previous conversation, using titles to disambiguate
+                # note that we make the assumption that only one movie should be processed at a time
+                # TODO: check if this fits with the sample input
+                self.candidates = self.disambiguate_candidates(" ".join(titles), self.candidates)
 
-            # using list comprehension (python doesn't have a flatMap!!) for all indices of all mentioned movies
-            self.candidates = [idx for title in titles for idx in self.find_movies_idx_by_title(title)]
+            # handling the candidate indices
+            if (len(self.candidates) > 1):
+                movie_list = '\n\t'.join([self.titles[idx][0] for idx in self.candidates])
+                response = "I found more than one movie with that name, which one did you mean? \n\t{}".format(movie_list)
+
+            elif (len(self.candidates) == 0):
+                title_str = "\" \"".join(titles)
+                response = f"Sorry, I couldn't find any movie with the title \"{title_str}\"!"
+
+            else:
+                # we have exactly one candidate, clear the candidates list
+                idx = self.candidates[0]
+                self.candidates = []
+                sentiment = self.predict_sentiment_rule_based(self.original_input)
+
+                # store the sentiment
+                self.sentiments[idx] = sentiment
+
+                response = "Got it, you {} '{}'".format(
+                    # randomly choose a verb based on sentiment
+                    random.choice(self.sentiment_verbs[sentiment]),
+                    self.titles[idx][0]
+                )
+
+                # recommend a movie if we have enough sentiments data
+                if len(self.sentiments) == 5:
+                    response += "\nThanks! That's enough for me to make a recommendation 😊\n"
+
+                    # get the recommendation
+                    self.recommended_movies = self.recommend_movies(self.sentiments, 5)
+
+                    response += "I recommend you watch: {}".format(self.recommended_movies[self.recommended_movies_index])
+                    self.recommended_movies_index += 1
+
+                    response += "\nWould you like to hear another recommendation? (Or enter :quit if you're done.)"
+
         else:
-            # this is a continuation of a previous conversation, using titles to disambiguate
-            # note that we make the assumption that only one movie should be processed at a time
-            # TODO: check if this fits with the sample input
-            self.candidates = self.disambiguate_candidates(" ".join(titles), self.candidates)
+            # if it's not quit, we suggest a movie (maybe handle cases like "no" here?)
+            if not self.asked_to_recommend or line.lower().strip() == "no":
+                self.asked_to_recommend = False
+                response = "Okay, have a nice day!"
+            elif self.recommended_movies_index >= len(self.recommended_movies):
+                response = "Sorry, I don't have any more recommendations for you."
+            else:
+                response = "I recommend you watch: {}".format(self.recommended_movies[self.recommended_movies_index])
+                self.recommended_movies_index += 1
 
-        # handling the candidate indices
-        if (len(self.candidates) > 1):
-            movie_list = '\n\t'.join([self.titles[idx][0] for idx in self.candidates])
-            response = "I found more than one movie with that name, which one did you mean? \n\t{}".format(movie_list)
-
-        elif (len(self.candidates) == 0):
-            response = "Sorry, I couldn't find any movie with that title!"
-
-        else:
-            # we have exactly one candidate
-            idx = self.candidates[0]
-            sentiment = self.predict_sentiment_rule_based(self.original_input)
-
-            # store the sentiment
-            self.sentiments[idx] = sentiment
-
-            response = "Got it, you {} '{}'".format(
-                # randomly choose a verb based on sentiment
-                random.choice(self.sentiment_verbs[sentiment]),
-                self.titles[self.candidates[0]][0]
-            )
+                response += "\nWould you like to hear another recommendation? (Or enter :quit if you're done.)"
 
         return response
 
@@ -546,7 +579,7 @@ Example: I _____(liked/disliked/...) "Movie Title"
             - num_return (optional, int): The number of movies to recommend
 
         Example:
-            bot_recommends = chatbot.recommend_movie({100: 1, 202: -1, 303: 1, 404:1, 505: 1})
+            bot_recommends = chatbot.recommend_movies({100: 1, 202: -1, 303: 1, 404:1, 505: 1})
             print(bot_recommends) // prints ['Trick or Treat (1986)', 'Dunston Checks In (1996)',
             'Problem Child (1990)']
 
@@ -558,7 +591,14 @@ Example: I _____(liked/disliked/...) "Movie Title"
         ########################################################################
         #                          START OF YOUR CODE                          #
         ########################################################################
-        return [""]  # TODO: delete and replace this line
+        # format user_ratings to a numpy array indexed by movie id
+        user_rating_all_movies = np.zeros(shape=self.ratings.shape[0])
+        for key, value in user_ratings.items():
+            user_rating_all_movies[key] = value
+
+        indices = util.recommend(user_rating_all_movies, self.ratings, num_return)
+
+        return [self.titles[idx][0] for idx in indices]
         ########################################################################
         #                          END OF YOUR CODE                            #
         ########################################################################
