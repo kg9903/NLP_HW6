@@ -29,12 +29,13 @@ class Chatbot:
 
         # Load sentiment words
         self.sentiment = util.load_sentiment_dictionary('data/sentiment.txt')
-        #print("Attention:", self.sentiment)
 
         # Train the classifier
         self.train_logreg_sentiment_classifier()
 
         # TODO: put any other class variables you need here
+        # the list of candidates for disambiguating the movie title
+        self.candidates = []
 
     ############################################################################
     # 1. WARM UP REPL                                                          #
@@ -147,37 +148,32 @@ Example: I _____(liked/disliked/...) "Movie Title"
         ########################################################################
 
         titles = self.extract_titles(line)
-        print("Attention: Extracted titles:", titles)
+        if (len(titles) == 0):
+            response = "Tell me about a movie that you have seen, with the name of the movie **in quotation marks**."
+            return response
 
-        if titles != []: titleIdx = self.find_movies_idx_by_title(titles[0])
-        print("Attention: Index of movie with title \"{}\": {}".format(titles[0], titleIdx))
+        if (len(self.candidates) == 0):
+            # new conversation, treat titles as new movie titles
 
-        if (titles == []):
-            response = "Tell me about a movie that you have seen, with the name of the movie in quotation marks."
+            # using list comprehension (python doesn't have a flatMap!!) for all indices of all mentioned movies
+            self.candidates = [idx for title in titles for idx in self.find_movies_idx_by_title(title)]
+        else:
+            # this is a continuation of a previous conversation, using titles to disambiguate
+            # note that we make the assumption that only one movie should be processed at a time
+            # TODO: check if this fits with the sample input
+            self.candidates = self.disambiguate_candidates(" ".join(titles), self.candidates)
 
-        elif (len(titleIdx) > 1):
+        # handling the candidate indices
+        if (len(self.candidates) > 1):
+            movie_list = '\n\t'.join([self.titles[idx][0] for idx in self.candidates])
+            response = "I found more than one movie with that name, which one did you mean? \n\t{}".format(movie_list)
 
-            print("Attention: Multiple movies found with title \"{}\"".format(titles[0]), '\n')
-
-            movie_list = ', '.join(['ID:{} Title: "{}"'.format(idx, self.titles[idx][0]) for idx in titleIdx])
-            for idx in titleIdx:
-                print("Attention: Adding index", idx, "to the movie list:", self.titles[idx][0], "\n")
-            print("Attention: The list of movie titles is:", movie_list, '\n')
-
-            response = "I found more than one movie with that name, which one did you mean? \n\n\t{}".format(movie_list)
-
-
-
-
-        elif (len(titleIdx) == 1):
-            response = "\nGot it, you meant '{}'\n".format(self.titles[titleIdx[0]][0])
-            print("Attention: Unique movie found with title", titles[0],"\n")
+        elif (len(self.candidates) == 0):
+            response = "Sorry, I couldn't find any movie with that title!"
 
         else:
-            response = "Sorry, I couldn't find any movie with that title!"
-            print("Attention: No movies found with title", titles[0],"\n")
+            response = "Got it, you meant '{}'".format(self.titles[self.candidates[0]][0])
 
-        #response = "I (the chatbot) processed '{}'".format(line)
 
         return response
 
@@ -224,8 +220,6 @@ Example: I _____(liked/disliked/...) "Movie Title"
         pattern = r"[\"]([^\"]*)[\"]"
 
         x = re.findall(pattern, user_input)
-
-        print("\nAttention: Extract_Titles: ",x, "\n")
 
         return x
 
@@ -335,7 +329,6 @@ Example: I _____(liked/disliked/...) "Movie Title"
         #                          START OF YOUR CODE                          #
         ########################################################################
         matches = [t for t in candidates if re.search(clarification, self.titles[t][0], re.IGNORECASE) is not None]
-        print("Attention: The candidates that matched the input 'clarification' '{}' are at indices:".format(clarification), matches)
 
         return matches # TODO: delete and replace this line
         ########################################################################
