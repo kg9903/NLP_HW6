@@ -1,3 +1,4 @@
+import random
 import numpy as np
 import argparse
 import joblib
@@ -34,8 +35,20 @@ class Chatbot:
         self.train_logreg_sentiment_classifier()
 
         # TODO: put any other class variables you need here
+
+        # the original input from the user (for sentiment analysis)
+        self.original_input = ""
+
         # the list of candidates for disambiguating the movie title
         self.candidates = []
+
+        # ID -> sentiment (+1, 0, or -1)
+        self.sentiments = {}
+        self.sentiment_verbs = {
+            1: ['liked', 'loved', 'enjoyed', 'appreciated', 'took pleasure in'],
+            0: ['do not have an opinion on', 'do not feel strongly about'],
+            -1: ['did not like', 'did not enjoy', 'did not appreciate', 'did not fancy'],
+        }
 
     ############################################################################
     # 1. WARM UP REPL                                                          #
@@ -154,6 +167,7 @@ Example: I _____(liked/disliked/...) "Movie Title"
 
         if (len(self.candidates) == 0):
             # new conversation, treat titles as new movie titles
+            self.original_input = line
 
             # using list comprehension (python doesn't have a flatMap!!) for all indices of all mentioned movies
             self.candidates = [idx for title in titles for idx in self.find_movies_idx_by_title(title)]
@@ -172,8 +186,18 @@ Example: I _____(liked/disliked/...) "Movie Title"
             response = "Sorry, I couldn't find any movie with that title!"
 
         else:
-            response = "Got it, you meant '{}'".format(self.titles[self.candidates[0]][0])
+            # we have exactly one candidate
+            idx = self.candidates[0]
+            sentiment = self.predict_sentiment_rule_based(self.original_input)
 
+            # store the sentiment
+            self.sentiments[idx] = sentiment
+
+            response = "Got it, you {} '{}'".format(
+                # randomly choose a verb based on sentiment
+                random.choice(self.sentiment_verbs[sentiment]),
+                self.titles[self.candidates[0]][0]
+            )
 
         return response
 
@@ -373,49 +397,49 @@ Example: I _____(liked/disliked/...) "Movie Title"
 
 
         words = re.sub(r'".*?"', '', user_input.lower())
-        print("Attention: After removing movie title:", words)
+        # print("Attention: After removing movie title:", words)
 
         words = re.findall(r'\b\w+\b', words)
-        print("Attention: After split:", words)
+        # print("Attention: After split:", words)
 
         p_tkcount = 0
 
         n_tkcount = 0
 
         for word in words:
-            print("Attention: The word '{}' is in the sentiment dictionary: {}".format(word, word in self.sentiment))
+            # print("Attention: The word '{}' is in the sentiment dictionary: {}".format(word, word in self.sentiment))
 
             if word in self.sentiment:
-                print("Attention: The word '{}' is in the sentiment dictionary".format(word))
+                # print("Attention: The word '{}' is in the sentiment dictionary".format(word))
 
                 if self.sentiment[word] == 'pos':
-                    print("Attention: The word '{}' is positive".format(word))
+                    # print("Attention: The word '{}' is positive".format(word))
                     p_tkcount += 1
-                    print("Attention: The current pos_tokcount is:", p_tkcount)
+                    # print("Attention: The current pos_tokcount is:", p_tkcount)
 
                 elif self.sentiment[word] == 'neg':
                     print("Attention: The word '{}' is negative".format(word))
-                    n_tkcount += 1
-                    print("Attention: The current neg_tokcount is:", n_tkcount)
+                    # n_tkcount += 1
+                    # print("Attention: The current neg_tokcount is:", n_tkcount)
 
 
         if p_tkcount == 0 and n_tkcount == 0:
-            print("Attention: The sentiment of the input '{}' is neutral".format(user_input))
+            # print("Attention: The sentiment of the input '{}' is neutral".format(user_input))
             return 0
 
         else:
             sentiment_score = (p_tkcount - n_tkcount) / (p_tkcount + n_tkcount)
 
             if sentiment_score == 0:
-                print("Attention: The sentiment of the input '{}' is neutral".format(user_input))
+                # print("Attention: The sentiment of the input '{}' is neutral".format(user_input))
                 return sentiment_score
 
             elif sentiment_score > 0:
-                print("Attention: The sentiment of the input '{}' is positive".format(user_input))
+                # print("Attention: The sentiment of the input '{}' is positive".format(user_input))
                 return sentiment_score
 
             else:
-                print("Attention: The sentiment of the input '{}' is negative".format(user_input))
+                # print("Attention: The sentiment of the input '{}' is negative".format(user_input))
                 return sentiment_score
 
         #return 0 # TODO: delete and replace this line
