@@ -67,6 +67,10 @@ compared to an end-to-end deep learning approach, e.g. ChatGPT?
 
 Q4_your_answer = """
 
-Delete and put your answer here
+One advantage of our approach is that it requires much less data and is more computationally lightweight compared to ChatGPT.
+Our model is also more interpretable and far less prone to hallucinations.
+However, one disadvantage of our model is that it does not generalize well, i.e., we can't easily build a video game chatbot using 
+existing Regexes and models. Furthermore, it requires a more hands-on approach to model construction, with a lot of manual tuning and 
+hard-coded responses to inputs, which makes it less flexible than something like ChatGPT
 
 """
