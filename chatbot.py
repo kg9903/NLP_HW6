@@ -573,7 +573,9 @@ Example: I _____(liked/disliked/...) "Movie Title"
         ########################################################################
         #                          START OF YOUR CODE                          #
         ########################################################################
-        X_in = self.count_vectorizer.transform([user_input.lower()])
+        # remove the film title
+        words = re.sub(r'".*?"', '', user_input.lower())
+        X_in = self.count_vectorizer.transform([words])
 
         if X_in.sum() == 0:
             # if input has no words, neutral
